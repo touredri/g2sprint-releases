@@ -107,6 +107,8 @@
     }
     .btn-play small { display: block; font-size: 12px; font-weight: 400; color: rgba(255, 255, 255, 0.7); }
     .btn-play:hover { background: #1d2a52; }
+    .btn-play.is-soon { opacity: 0.85; cursor: default; }
+    .btn-play.is-soon:hover { background: var(--ink); }
     .phone-note .btn-play { margin-top: 10px; }
     body.on-phone .download > .btn-play { display: none; }
 
@@ -212,7 +214,7 @@
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
               <span>Télécharger pour Windows<small id="download-meta">Dernière version</small></span>
             </a>
-            <a class="btn-play" href="https://play.google.com/store/apps/details?id=com.touredri.stockez" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Disponible sur Google Play</span></a>
+            <span class="btn-play is-soon" title="L’application Android est en test : bientôt disponible"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Bientôt sur Google Play</span></span>
             <ul class="facts">
               <li>Windows 10 et 11</li>
               <li>Gratuit</li>
@@ -221,7 +223,7 @@
             <div class="phone-note" role="note">
               Vous êtes sur un téléphone. G2Sprint s’installe sur l’ordinateur Windows de la boutique : ouvrez ce lien sur l’ordinateur.
               <br /><button type="button" id="copy-link">Copier le lien</button>
-              <br />Pour le téléphone, prenez l’application Android :<br /><a class="btn-play" href="https://play.google.com/store/apps/details?id=com.touredri.stockez" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Disponible sur Google Play</span></a>
+              <br />Pour le téléphone, l’application Android arrive bientôt :<br /><span class="btn-play is-soon" title="L’application Android est en test : bientôt disponible"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Bientôt sur Google Play</span></span>
             </div>
           </div>
         </div>
@@ -298,7 +300,7 @@
         <div>
           <h2 id="phone-data">Vous utilisez déjà G2Sprint sur téléphone ?</h2>
           <p>Faites une sauvegarde dans l’application du téléphone, copiez le fichier sur l’ordinateur, puis choisissez « Récupérer les données de mon téléphone » au premier lancement. Vos articles, ventes et clients vous suivent.</p>
-          <p style="margin-top:14px"><a class="btn-play" href="https://play.google.com/store/apps/details?id=com.touredri.stockez" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Disponible sur Google Play</span></a></p>
+          <p style="margin-top:14px"><span class="btn-play is-soon" title="L’application Android est en test : bientôt disponible"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 2.8v18.4c0 .6.6.9 1.1.6l15.4-9.2c.5-.3.5-1 0-1.3L5.1 2.2C4.6 1.9 4 2.2 4 2.8Z"/></svg><span><small>Sur téléphone Android</small>Bientôt sur Google Play</span></span></p>
         </div>
       </div>
     </section>
@@ -335,7 +337,10 @@
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (release) {
           if (!release) return;
-          var exe = (release.assets || []).find(function (a) { return /-setup\.exe$/i.test(a.name); });
+          var assets = release.assets || [];
+          // L'installateur complet (hors ligne) ; l'autre .exe sert aux mises à jour automatiques.
+          var exe = assets.find(function (a) { return /installation-hors-ligne\.exe$/i.test(a.name); }) ||
+            assets.find(function (a) { return /-setup\.exe$/i.test(a.name); });
           if (!exe) return;
           link.href = exe.browser_download_url;
           var version = String(release.tag_name || '').replace(/^v/, '');
